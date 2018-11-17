@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# Stalker WM Portal road warrior installer for Debian, Ubuntu
+
+# This script will work on Debian, Ubuntu and probably other distros
+# of the same families, although no support is offered for them. It isn't
+# bulletproof but it will probably work if you simply want to setup a Stalker WM Portal on
+# your Debian/Ubuntu box. It has been designed to be as unobtrusive and
+# universal as possible.
+
+# This is a free shell script under GNU GPL version 3.0 or above
+# Copyright (C) 2017 LinuxHelps project.
+# Feedback/comment/suggestions : https://linuxhelps.net/
+# Author Ivan Bachvarov a.k.a SlaSerX
+
+
+#Update and Upgrade
+echo "Updating and Upgrading"
+apt-get update && sudo apt-get upgrade -y
+
+# Setting for the new UTF-8 terminal support in Lion
+export LC_CTYPE=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+sudo apt-get install -y dialog wget curl nano sudo unzip
+chmod +x ./lab/*
+(
+c=20
+while [ $c -ne 120 ]
+    do
+        echo $c
+        echo "###"
+        echo "$c %"
+        echo "###"
+        ((c+=20))
+        sleep 1
+done
+) |
+dialog --title "Installation will begin shortly" --gauge "Please wait ...." 10 60 0
+
+
+if [[ $EUID -ne 0 ]]; then
+ echo "This script must be run as root" 
+ exit 1
+else
+ cmd=(dialog --separate-output --checklist "Please Select Software you want to install:" 22 76 16)
+ options=(1 "Install Ministra Portal" off # any option can be set to default to "on"
+ 2 "Install Stalker Portal" off
+ 3 "Install Ministra on Ubuntu 16.04" off
+ 4 "Exit" off)
+ choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
+ clear
+ for choice in $choices
+ do
+ case $choice in
+ 1)
+ #Install Ministra*
+ echo "Installing Ministra"
+ ./lab/ministra
+;;
+2)
+ #Install Stalker
+ echo "Installing Stalker"
+./lab/stalker
+ ;;
+
+3)
+ #Install Ubuntu 16.04
+ echo "Install Ministra on Ubuntu 16.04"
+./lab/ubuntu16
+ ;;
+
+ #Exit
+4)
+exit
+ ;;
+
+ esac
+ done
+fi
+
+
